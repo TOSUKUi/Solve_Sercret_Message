@@ -1,3 +1,5 @@
 *.pdf
 *.out
 *.txt
+*.py
+*.o

@@ -1,6 +1,6 @@
 /*=============================
   情報実験1
-  課題1-クライアント.ver2
+  謎解き.ver2
   BP13007
   雨宮俊貴
   ©2015 雨宮俊貴
@@ -14,8 +14,11 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include<errno.h>
+#include "Sha256.h"
 
 #define SOCK_NAME "./socket"
+#define PASS_ERROR "Password Incorrect. Connection closed."
+
 
 int main(int argc, char *argv[])
 {
@@ -24,24 +27,27 @@ int main(int argc, char *argv[])
   int soc;
   char buf[1024];
   char temp[256];
+  char key[65];
+  char command[256];
   int i=0;
   int maxfd;
   int ret;
   struct timeval tv;    /* タイムアウト時間 */
-      /* 戻り値保持用 */
+  /* 戻り値保持用 */
 
-  tv.tv_sec = 3;
+  tv.tv_sec = 1;
   tv.tv_usec = 0;
 
   if(argc < 3){
     printf("You didnt input any information of oponent.\nusage: kadai1_Client.out IP_Address port_number\n");
     exit(1);
   }
-    if ( ( soc = socket( AF_INET, SOCK_STREAM, 0 ) ) < 0 ) {
+
+  if ( ( soc = socket( AF_INET, SOCK_STREAM, 0 ) ) < 0 ) {
     perror( "socket" );
     exit( 1 );
   }
-  
+    
   memset( (char *)&saddr, 0, sizeof( saddr ) );
   saddr.sin_family=AF_INET;
   saddr.sin_addr.s_addr = inet_addr(argv[1]);
@@ -88,36 +94,69 @@ int main(int argc, char *argv[])
   read(soc,buf,1024);      
   fprintf(stderr,"c");
   fprintf(stderr,"%s\n",buf);
-  sprintf(buf,"UID %s","bp13007");
-  write(soc,buf,strlen(buf));
+  sprintf(buf,"UID %s\n","bp13007");
+  fprintf(stderr,"%s",buf);
+  write(soc,buf,strlen(buf) + 1);
   fsync(soc);
   read(soc,buf,1024);  
   printf("read = %s\n",buf);
+      
   if(!strncmp(buf,"Your key",8)){          
+    {
+      sscanf(buf,"Your key: %s\n",temp);
+      fprintf(stderr,"temp = %s\n",temp);
+      compute_sha256(temp,strlen(temp),key);
+    }
     fsync(soc);
     read(soc,buf,1024);
-    printf("%s\n",buf);
-    printf("input key is Encrypted with SHA256:");
-    scanf("%s",temp);
-    sprintf(buf,"PWD %s",temp);
-    printf("buf = %s\n",buf);
-    write(soc,buf,strlen(buf));
-    fsync(soc);
+    printf("%s\n",buf);    
+    sprintf(buf,"PWD %s",key);
+    fprintf(stderr,"%s\n",buf);
+    write(soc,buf,strlen(buf) + 1);
+    ret = select(soc+1, &readfds, NULL, NULL, &tv); //受信の場合
+    if(ret < 0){
+    perror("select()");
+    fprintf(stderr,"select error\n");
+    return 0;
+    }
+    else if(ret==0){
+      fprintf(stderr,"Input your key:");
+      fprintf(stderr,"%s\n",temp);
+      sprintf(command,"INF %s",temp);
+      fprintf(stderr,"command = %s\n",command);
+      strcpy(buf,command);
+      write(soc,buf,strlen(buf) + 1);
+      fsync(soc);
+      read(soc,buf,1024);
+      fprintf(stderr,"%s\n",buf);
+      return 0;
+    }
+    
     read(soc,buf,1024);
-    scanf("%s",temp);
-    printf("input key:");
+    fprintf(stderr,"%s\n",buf);
+    if(!strcmp(buf,PASS_ERROR)){
+      close(soc);
+      return 0;
+    }
+    fprintf(stderr,"input key:");
+    scanf("%s",temp);    
     sprintf(buf,"INF %s",temp);
     printf("buf = %s\n",buf);
-    write(soc,buf,strlen(buf));
+    write(soc,buf,strlen(buf) + 1);
     fsync(soc);
     read(soc,buf,1024);
     printf("%s\n",buf);
+  }else if(!strncmp(buf,"Unregistered",12)){
+    printf("miss id\n");
+    close(soc);
+    return 0;
   }else{
     printf("its not true server\n");
     close(soc);
     return 0;
   }
-  
+
+
   /*
     while( fgets( buf, 1024, stdin ) ) {
     if ( buf[strlen(buf)-1] == '\n' ) buf[strlen(buf)-1] = '\0';

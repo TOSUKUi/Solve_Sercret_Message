@@ -1,0 +1,8 @@
+Protocol.out: Protocol.o Sha256.o
+	gcc-5 -O0 -g -o Protocol.out Protocol.o Sha256.o  
+
+Protocol.o:Protocol.c
+	gcc-5 -c Protocol.c
+
+Sha256.o:Sha256.c
+	gcc-5 -c Sha256.c
