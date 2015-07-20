@@ -6,21 +6,10 @@
   ©2015 TOSUKUi
   ===============================*/
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include<errno.h>
-#include "Sha256.h"
-
-#define SOCK_NAME "./socket"
-#define PASS_ERROR "Password Incorrect. Connection closed."
+#include "Protocol_begin.h"
 
 
-int main(int argc, char *argv[])
+char *func_protocol_begin(char *ip_address,char *port)
 {
   fd_set readfds;
   struct sockaddr_in saddr;
@@ -50,8 +39,8 @@ int main(int argc, char *argv[])
     
   memset( (char *)&saddr, 0, sizeof( saddr ) );
   saddr.sin_family=AF_INET;
-  saddr.sin_addr.s_addr = inet_addr(argv[1]);
-  saddr.sin_port = htons(atoi(argv[2]));
+  saddr.sin_addr.s_addr = inet_addr(ip_address);
+  saddr.sin_port = htons(atoi(port));
 
   /*
     struct hostent *hp;
@@ -68,33 +57,28 @@ int main(int argc, char *argv[])
     
   if ( connect( soc, ( struct sockaddr * )&saddr, ( socklen_t )sizeof( saddr ) ) < 0 ) {
     perror( "connect" ); 
-    fprintf(stderr,"Port%s : any process isnt running.\n",argv[2]);
+    fprintf(stderr,"Port%s : any process isnt running.\n",port);
     exit( 1 );
   }
   FD_ZERO(&readfds);
   FD_SET(soc,&readfds);
   maxfd = soc;
   
+  fprintf( stderr, "Connection established: socket %d used and Port : %s.\n", soc,port);       
   
-  
-  
-  fprintf( stderr, "Connection established: socket %d used and Port : %s.\n", soc,argv[2]);       
-  fprintf(stderr,"a");
   ret = select(soc+1, &readfds, NULL, NULL, &tv); //受信の場合
   if(ret < 0){
     perror("select()");
     fprintf(stderr,"select error\n");
-    return 0;
+    return NULL;
   }
   else if(ret==0){
     printf("its not true server Port\n");
-    return 0;
+    return NULL;
   }
-  fprintf(stderr,"b");    
   read(soc,buf,1024);      
-  fprintf(stderr,"c");
   fprintf(stderr,"%s\n",buf);
-  sprintf(buf,"UID %s\n","bp13007");
+  sprintf(buf,"UID %s\n","bp13007"); //入力IDの整形
   fprintf(stderr,"%s",buf);
   write(soc,buf,strlen(buf) + 1);
   fsync(soc);
@@ -110,33 +94,33 @@ int main(int argc, char *argv[])
     fsync(soc);
     read(soc,buf,1024);
     printf("%s\n",buf);    
-    sprintf(buf,"PWD %s",key);
+    sprintf(buf,"PWD %s",key);//入力passwordの整形
     fprintf(stderr,"%s\n",buf);
     write(soc,buf,strlen(buf) + 1);
     ret = select(soc+1, &readfds, NULL, NULL, &tv); //受信の場合
     if(ret < 0){
     perror("select()");
     fprintf(stderr,"select error\n");
-    return 0;
+    return NULL;
     }
     else if(ret==0){
       fprintf(stderr,"Input your key:");
       fprintf(stderr,"%s\n",temp);
-      sprintf(command,"INF %s",temp);
+      sprintf(command,"INF %s",temp);//入力コマンドの整形
       fprintf(stderr,"command = %s\n",command);
       strcpy(buf,command);
       write(soc,buf,strlen(buf) + 1);
       fsync(soc);
       read(soc,buf,1024);
       fprintf(stderr,"%s\n",buf);
-      return 0;
+      return temp;
     }
     
     read(soc,buf,1024);
     fprintf(stderr,"%s\n",buf);
     if(!strcmp(buf,PASS_ERROR)){
       close(soc);
-      return 0;
+      return NULL;
     }
     fprintf(stderr,"input key:");
     scanf("%s",temp);    
@@ -149,24 +133,13 @@ int main(int argc, char *argv[])
   }else if(!strncmp(buf,"Unregistered",12)){
     printf("miss id\n");
     close(soc);
-    return 0;
+    return NULL;
   }else{
     printf("its not true server\n");
     close(soc);
-    return 0;
+    return NULL;
   }
-
-
-  /*
-    while( fgets( buf, 1024, stdin ) ) {
-    if ( buf[strlen(buf)-1] == '\n' ) buf[strlen(buf)-1] = '\0';
-    write( soc, buf, strlen(buf)+1 );
-    fsync( soc );
-    read( soc, buf, strlen(buf)+1 );
-    fprintf( stdout, "%s\n", buf );
-    }
-  */
   close( soc );
 
-  return 0;
+  return NULL;
 }
