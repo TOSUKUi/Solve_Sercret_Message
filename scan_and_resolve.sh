@@ -11,7 +11,7 @@ echo "空いているポートの数 = "${#PORT[@]}
 
 for i in ${PORT[@]}
 do
-    ./Protocol.out $@ ${i}
+    ./Protocol2.out $@ ${i}
     
 done    
 

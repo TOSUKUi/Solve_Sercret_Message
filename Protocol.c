@@ -24,12 +24,13 @@ int main(int argc, char *argv[])
 {
   fd_set readfds;
   struct sockaddr_in saddr;
-  int soc;
+  
   char buf[1024];
   char temp[256];
   char key[65];
   char command[256];
   int i=0;
+  int soc;
   int maxfd;
   int ret;
   struct timeval tv;    /* タイムアウト時間 */
