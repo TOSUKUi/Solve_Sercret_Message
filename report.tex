@@ -1,0 +1,139 @@
+\documentclass[a4paper,12pt]{jarticle}
+\usepackage[top=30truemm,bottom=30truemm,right=25truemm,left=25truemm]{geometry}
+\title{謎}
+\author{BP13007\\ 70031PB貴俊宮雨}
+\date{\today}
+\usepackage{ascmac}	% required for `\itembox' (yatex added)
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{listings,jlisting}
+
+\lstset{%
+  language={C},
+    basicstyle={\small\ttfamily},%
+      identifierstyle={\small},%
+        commentstyle={\small\itshape},%
+	  keywordstyle={\small\bfseries},%
+	    ndkeywordstyle={\small},%
+	      stringstyle={\small\ttfamily},
+	        frame={tb},
+		  breaklines=true,
+		    columns=[l]{fullflexible},%
+		      numbers=left,%
+		        xrightmargin=0zw,%
+			  xleftmargin=3zw,%
+			    numberstyle={\scriptsize},%
+			      stepnumber=1,
+			        numbersep=1zw,%
+				  lineskip=-0.5ex%
+				  }
+
+
+
+\begin{document}
+\begin{titlepage}
+ \maketitle
+ \begin{center}
+  
+\begin{verbatim}
+ _____
+	< 謎 >
+	 -----
+	        \   ^__^
+	         \  (oo)\_______
+	            (__)\       )\/\
+	                ||----w |
+	                ||     ||	
+\end{verbatim}
+  \end{center}
+\end{titlepage}
+\section{全ての結論}
+謎の答えは\verb+[NAP]+であるのである。
+\section{第一のプロトコル}
+結論に至るにあたって、様々な謎をとく必要があった。これらの記述はそれらの謎の詳細を詳細に記述したものである。辛い道のりである。
+\subsection{第一のプロトコル詳細}
+第一のプロトコルのやりとりは以下の通りである。
+\begin{enumerate}
+ \item サーバーから接続成功メッセージ受信
+ \item クライアントからユーザーIDを[UID BP13007]という形にして送信
+ \item サーバーからユーザーID認証メッセージを送信
+ \item サーバーからパスワードの入力方法送信
+ \item クライアントからユーザーPasswordをもらったキーをsha256ハッシュして[PWD password]として送信。
+ \item クライアントからキーを[INF key]として送信
+ \item サーバーから情報を送信      
+\end{enumerate}
+\subsection{第一のプロトコル実行結果}
+\begin{itembox}{実行結果(正しいサーバーの時の実行結果)}
+\begin{verbatim}
+	Connection established: socket 3 used and Port : 28828.
+	INFOEXP1-MIYOSHI-1503_1_Ver8.02
+	read = Your key: askTmul8wEbvNQD3
+	Send the SHA256 hash value of the key as your passwd in 10 seconds.
+	For making the SHA256 hash value, see the following
+	URL: http://www.geocities.jp/iexp1m/15wSiu2aH3Auad256SwuRulC/
+	Your key: mZn3Slef
+	Access URL2: http://www.geocities.jp/iexp1m/15ut8dfnD344kaS7aUah/	
+\end{verbatim}
+\end{itembox}
+  \subsection{ポートスキャンに関して}
+シェルスクリプトを利用し、nmapを利用したポートスキャニングを行う。nmapで得られたポート番号列を順に実行ファイルのコマンドラインに入力していくこととした。
+\subsection{サーバーの判別に関して}
+正しいサーバーにつなげた時だけまともなメッセージを返してくれるので、それを条件として正しいサーバーかどうかを判断する。仮に、正しいサーバーと認められない場合、サーバーが応答する場合は単純にプログラムを終了させ、サーバーが応答しない場合はタイムアウトにて対応しよう。
+\subsection{つまずいた点}
+訳のわからない謎の資料を分析し、プロトコルを実装した。つまづいた点としては、writeの際に文字列長に+1をしていなかったため、最後のサーバーへの送信文字列の処理が正しくなされなかったこと。タイムアウトを実装することに関して非常につまづいていた。それ以外は問題なかった。
+\subsection{プロトコル1のソースコード}
+ シェルスクリプトはソースコード\ref{Protocol1_scan}\\
+ c言語ソースコードはソースコード\ref{Protocol1}に示す。
+
+ \section{第二のプロトコル}
+ 第一のプロトコルでよっぽど疲れてしまい、私はゲームばかりやっていた。なぜなら、とても第一のプロトコルで疲れていたからである。それは、とても疲れていることであった。最終的に3週間くらいたってからやっていたことを今は懐かしく思う。
+
+  \subsection{第二のプロトコルの実行結果}
+ \begin{itembox}{第二のプロトコルの実行結果}
+  \begin{verbatim}
+Connection established: socket 3 used and Port : 25216.
+	INFOEXP1-MIYOSHI-1503_2_Ver8.00
+	This is Socket Commuication system
+	Welcome bp13007, you are correctly authenticated.
+	Your protocol is: 13200
+	4
+	Excellent. Go to next protocol
+	-3134
+	-43
+	-682
+	7331
+	Excellent. Go to next protocol
+	4721
+	Excellent. Go to next protocol
+	1083
+	Excellent. Go to next protocol
+	Your final keyword: 150729161135:ZdbUlO1zFDnpRchb
+	Access URL: http://www.minet.se.shibaura-it.ac.jp/iexp1_2015/
+	Hint: 140:1h	
+  \end{verbatim}
+ \end{itembox}
+ 
+ \subsection{第二のプロトコルのソースコード}
+ シェルスクリプトは\ref{Protocol2_scan} \\
+ c言語ソースコードはソースコード\ref{Protocol2}を参照。
+ \section{5号間探検の章}
+ \subsection{4FNo24の闇}
+ この闇は非常に深かった。生徒用のロッカーを漁り続けていたが、ついぞ見つからなかったのである。しかし、あることに気がついたのである。それは私があるレポートを提出する際、レポートボックスの番号振りは二桁だったのだ。従って見つけることができた。番号と対応した表。
+ 
+ \subsection{裏を見る}
+ 裏をみよと言われたので裏を見た。N
+ \subsection{謎の計算}
+ ルートを計算したところ D
+ \subsection{テーブルの覗き魔}
+ 机の裏になんか貼らないでくれ。P
+ \subsection{事件}
+ サーバーコンピューターにぶち込まれていた。A
+ \subsection{土足厳禁}
+ 松浦先生と鉢合わせして気まずかった。I
+ \subsection{結論}
+ これらで集めたキーワードを集めていき、4FNo24の闇の表に照らし合わせて行って、NAPという答えを得たのである。NAPってなんだ？.
+ \section{図、ソースコード群}
+ \lstinputlisting[caption=プロトコル1のシェルスクリプト,label=Protocol1_scan]{scan_and_resolve1.sh}
+ \lstinputlisting[caption=プロトコル2のシェルスクリプト,label=Protocol2_scan]{scan_and_resolve.sh}
+ \lstinputlisting[caption=プロトコル1のプログラム,label=Protocol1]{Protocol.c}
+ \lstinputlisting[caption=プロトコル2のプログラム,label=Protocol2]{Protocol2.c} 
+\end{document}

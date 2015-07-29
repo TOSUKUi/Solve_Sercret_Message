@@ -1,9 +1,9 @@
 /*=============================
   IE1
-  謎解き.ver2
+  nazotoki.ver2
   
   TOSUKUi
-  ©2015 TOSUKUi
+  2015 TOSUKUi
   ===============================*/
 
 #include <stdio.h>
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
   
   
   fprintf( stderr, "Connection established: socket %d used and Port : %s.\n", soc,argv[2]);       
-  fprintf(stderr,"a");
+
   ret = select(soc+1, &readfds, NULL, NULL, &tv); //受信の場合
   if(ret < 0){
     perror("select()");
@@ -91,12 +91,12 @@ int main(int argc, char *argv[])
     printf("its not true server Port\n");
     return 0;
   }
-  fprintf(stderr,"b");    
+
   read(soc,buf,1024);      
-  fprintf(stderr,"c");
+
   fprintf(stderr,"%s\n",buf);
   sprintf(buf,"UID %s\n","bp13007");
-  fprintf(stderr,"%s",buf);
+
   write(soc,buf,strlen(buf) + 1);
   fsync(soc);
   read(soc,buf,1024);  
@@ -105,14 +105,14 @@ int main(int argc, char *argv[])
   if(!strncmp(buf,"Your key",8)){          
     {
       sscanf(buf,"Your key: %s\n",temp);
-      fprintf(stderr,"temp = %s\n",temp);
+
       compute_sha256(temp,strlen(temp),key);
     }
     fsync(soc);
     read(soc,buf,1024);
     printf("%s\n",buf);    
     sprintf(buf,"PWD %s",key);
-    fprintf(stderr,"%s\n",buf);
+
     write(soc,buf,strlen(buf) + 1);
     ret = select(soc+1, &readfds, NULL, NULL, &tv); //受信の場合
     if(ret < 0){
@@ -121,10 +121,9 @@ int main(int argc, char *argv[])
     return 0;
     }
     else if(ret==0){
-      fprintf(stderr,"Input your key:");
-      fprintf(stderr,"%s\n",temp);
+
       sprintf(command,"INF %s",temp);
-      fprintf(stderr,"command = %s\n",command);
+
       strcpy(buf,command);
       write(soc,buf,strlen(buf) + 1);
       fsync(soc);

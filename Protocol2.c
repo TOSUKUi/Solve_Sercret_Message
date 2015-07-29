@@ -1,9 +1,9 @@
 /*Protocol2.c*/
 /*===============================
   IE1
-  謎解き.main ver2
+  nazotoki ver2-2
   TOSUKUi
-  ©201 TOSUKUi
+  TOSUKUi
   ===============================*/
 
 
